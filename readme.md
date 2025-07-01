@@ -40,7 +40,7 @@ With a clean and intuitive interface, it lets you create, edit, and delete notes
 
 ## Demonstration
 
-This is the live demo of [QuickNotes42](https://ababdelo.github.io/QuickNotes42/)
+This is the live demo of [QuickNotes42](https://ababdelo.github.io/quickNotes42/)
 
 ---
 
