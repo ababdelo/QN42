@@ -1,0 +1,18 @@
+
+#  Ignore History folder
+.history/*
+
+# Ignore Temporary files
+.temp/
+*.tmp
+*.temp
+
+# Ignore log files
+*.log
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore .vscode settings
+.vscode/
