@@ -31,16 +31,26 @@
         <button class="add-note-btn" onclick="openNoteDialog()">
           <i class="ri-add-line"></i> Add Note
         </button>
-        <input
-          type="search"
-          id="searchInput"
-          placeholder="Search notes..."
-          aria-label="Search notes"
-          class="search-input"
-        />
+        <div class="search-wrapper">
+          <input
+            type="search"
+            id="searchInput"
+            placeholder="Search notes..."
+            aria-label="Search notes"
+            class="search-input"
+          />
+          <i class="ri-search-2-line search-icon"></i>
+        </div>
+
         <button id="themeToggleBtn" class="theme-toggle-btn">
           <i class="ri-moon-line"></i>
         </button>
+      </div>
+
+      <!-- Archive filter tabs -->
+      <div class="filter-tabs">
+        <button class="filter-btn active" onclick="setFilter('all')">All Notes <i class="ri-sticky-note-fill"></i></button>
+        <button class="filter-btn" onclick="setFilter('archived')">Archived <i class="ri-archive-drawer-fill"></i></button>
       </div>
     </header>
 
