@@ -552,7 +552,7 @@ dialog::backdrop {
   font-size: 1.2rem;
 }
 
-/* Custom alert */
+/* Custom alert backdrop */
 .custom-alert {
   position: fixed;
   top: 0;
@@ -570,8 +570,9 @@ dialog::backdrop {
   display: none;
 }
 
+/* Alert box */
 .custom-alert-box {
-  background: var(--surface-color);
+  background: var(--surface-color); /* Support for light/dark themes */
   color: var(--text-color);
   padding: 2rem;
   border-radius: 12px;
@@ -582,16 +583,23 @@ dialog::backdrop {
   animation: popupFadeIn 0.3s ease;
 }
 
+/* Alert title (color is overridden dynamically in JS) */
 .custom-alert-box h3 {
   margin-bottom: 1.5rem;
   font-size: 1.4rem;
-  color: #e74c3c;
+  color: inherit; /* Allow dynamic JS styling */
 }
 
+/* Alert message */
+.custom-alert-box p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* OK button (default is red unless overridden in JS) */
 .custom-alert-box button {
-  margin-top: 1.5rem;
   padding: 0.5rem 1.5rem;
-  background-color: #e74c3c;
+  background-color: #e74c3c; /* default red */
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -601,21 +609,32 @@ dialog::backdrop {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Hover effect for red (error) */
 .custom-alert-box button:hover {
   background-color: #c0392b;
 }
 
+/* ✅ Blue base and hover (when .blue-btn class is applied in JS) */
+.custom-alert-box button.blue-btn {
+  background-color: #62a4e2;
+}
+
+.custom-alert-box button.blue-btn:hover {
+  background-color: #4e94d5;
+}
+
+/* Animation */
 @keyframes popupFadeIn {
   from {
     transform: scale(0.9);
     opacity: 0;
   }
-
   to {
     transform: scale(1);
     opacity: 1;
   }
 }
+
 
 /* Filter tabs */
 .filter-tabs {
