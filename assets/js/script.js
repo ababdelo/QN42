@@ -27,9 +27,9 @@ function saveNote(event) {
 
   const rawKeywords = keywordsInput
     ? keywordsInput
-        .split(",")
-        .map((k) => k.trim().toLowerCase())
-        .filter(Boolean)
+      .split(",")
+      .map((k) => k.trim().toLowerCase())
+      .filter(Boolean)
     : [];
 
   const uniqueKeywords = [...new Set(rawKeywords)];
@@ -120,9 +120,9 @@ function renderNotes(filteredNotes) {
 
   // Filter notes based on current filter (all or archived)
   if (currentFilter === "archived") {
-    notesToRender = notesToRender.filter(note => note.archived);
+    notesToRender = notesToRender.filter((note) => note.archived);
   } else {
-    notesToRender = notesToRender.filter(note => !note.archived);
+    notesToRender = notesToRender.filter((note) => !note.archived);
   }
 
   if (notesToRender.length === 0) {
@@ -133,7 +133,10 @@ function renderNotes(filteredNotes) {
     container.innerHTML = `
       <div class="empty-state">
         <img class="no-notes-image" src="assets/images/no-item.webp" alt="No Notes" />
-        <p>${currentFilter === "archived" ? "No archived notes found." : "Create your first note to get started!"}</p>
+        <p>${currentFilter === "archived"
+        ? "No archived notes found."
+        : "Create your first note to get started!"
+      }</p>
         <button class="add-note-btn" onclick="openNoteDialog()">
           <i class="ri-add-line"></i> Add Your First Note
         </button>
@@ -162,9 +165,8 @@ function renderNotes(filteredNotes) {
       <div class="note-card">
         <div class="note-body">
           <h3 class="note-title">
-            <i class="pin-icon ri-${
-              note.pinned ? "pushpin-fill" : "pushpin-line"
-            }" 
+            <i class="pin-icon ri-${note.pinned ? "pushpin-fill" : "pushpin-line"
+        }" 
             onclick="togglePin('${note.id}')" 
             title="${note.pinned ? "Unpin Note" : "Pin Note"}"
             style="cursor: pointer; margin-right: 0.5rem; vertical-align: middle;"></i>
@@ -176,17 +178,20 @@ function renderNotes(filteredNotes) {
 
         <div class="note-keywords">
           ${note.keywords
-            .map((kw) => `<span class="keyword-tag">${kw}</span>`)
-            .join("")}
+          .map((kw) => `<span class="keyword-tag">${kw}</span>`)
+          .join("")}
         </div>
         <div class="note-actions">
-          <button class="edit-btn" onclick="openNoteDialog('${note.id}')" title="Edit Note">
+          <button class="edit-btn" onclick="openNoteDialog('${note.id
+        }')" title="Edit Note">
             <i class="ri-pencil-line"></i>
           </button>
-          <button class="edit-btn" onclick="toggleArchive('${note.id}')" title="${note.archived ? "Unarchive Note" : "Archive Note"}">
+          <button class="edit-btn" onclick="toggleArchive('${note.id
+        }')" title="${note.archived ? "Unarchive Note" : "Archive Note"}">
             <i class="ri-archive-${note.archived ? "line" : "fill"}"></i>
           </button>
-          <button class="delete-btn" onclick="deleteNote('${note.id}')" title="Delete Note">
+          <button class="delete-btn" onclick="deleteNote('${note.id
+        }')" title="Delete Note">
             <i class="ri-delete-bin-6-line"></i>
           </button>
         </div>
@@ -263,7 +268,7 @@ function applyStoredTheme() {
 function setFilter(filterType) {
   currentFilter = filterType;
 
-  document.querySelectorAll(".filter-btn").forEach(btn => {
+  document.querySelectorAll(".filter-btn").forEach((btn) => {
     btn.classList.remove("active");
   });
 
@@ -312,10 +317,91 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
-      const alertBox = document.getElementById("customAlert");
-      if (!alertBox.classList.contains("hidden")) {
-        closeCustomAlert();
-      }
+      closeNoteDialog();
+      closeCustomAlert();
     }
   });
 });
+
+// --- IMPORT / EXPORT NOTES FEATURE ---
+
+document.getElementById("exportNotesBtn").addEventListener("click", () => {
+  if (notes.length === 0) {
+    showCustomAlert("No Notes", "There are no notes to export.");
+    return;
+  }
+  const dataStr = JSON.stringify(notes, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "quick-notes-export.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("importNotesBtn").addEventListener("click", () => {
+  document.getElementById("importNotesInput").click();
+});
+
+document
+  .getElementById("importNotesInput")
+  .addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedNotes = JSON.parse(e.target.result);
+
+        if (!Array.isArray(importedNotes)) {
+          throw new Error("Invalid format: JSON should be an array of notes.");
+        }
+
+        let newNotesCount = 0;
+
+        importedNotes.forEach((note) => {
+          if (
+            note.id &&
+            note.title &&
+            note.content &&
+            typeof note.createdAt === "string" &&
+            typeof note.modifiedAt === "string" &&
+            Array.isArray(note.keywords) &&
+            typeof note.pinned === "boolean" &&
+            typeof note.archived === "boolean"
+          ) {
+            if (!notes.find((n) => n.id === note.id)) {
+              notes.push(note);
+              newNotesCount++;
+            }
+          }
+        });
+
+        if (newNotesCount === 0) {
+          showCustomAlert(
+            "Import Result",
+            "No new notes were imported (all duplicates)."
+          );
+        } else {
+          showCustomAlert(
+            "Import Result",
+            `${newNotesCount} note(s) imported successfully.`
+          );
+          saveNotes();
+          renderNotes();
+        }
+      } catch (error) {
+        showCustomAlert(
+          "Import Error",
+          "Failed to import notes: Invalid JSON file."
+        );
+      }
+    };
+    reader.readAsText(file);
+
+    event.target.value = "";
+  });
