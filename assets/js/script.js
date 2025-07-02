@@ -1,5 +1,6 @@
 let notes = [];
 let editingNoteId = null;
+let currentFilter = "all"; // 'all' or 'archived'
 
 function loadNotes() {
   const savedNotes = localStorage.getItem("quickNotes");
@@ -68,7 +69,7 @@ function saveNote(event) {
       createdAt: now,
       modifiedAt: now,
       keywords: uniqueKeywords,
-      pinned: false, // Fixed: New notes are unpinned by default
+      pinned: false,
       archived: false,
     });
   }
@@ -103,9 +104,26 @@ function togglePin(noteId) {
   }
 }
 
+function toggleArchive(noteId) {
+  const note = notes.find((n) => n.id === noteId);
+  if (note) {
+    note.archived = !note.archived;
+    note.modifiedAt = new Date().toISOString();
+    saveNotes();
+    renderNotes();
+  }
+}
+
 function renderNotes(filteredNotes) {
   const container = document.getElementById("notesContainer");
-  const notesToRender = Array.isArray(filteredNotes) ? filteredNotes : notes;
+  let notesToRender = Array.isArray(filteredNotes) ? filteredNotes : notes;
+
+  // Filter notes based on current filter (all or archived)
+  if (currentFilter === "archived") {
+    notesToRender = notesToRender.filter(note => note.archived);
+  } else {
+    notesToRender = notesToRender.filter(note => !note.archived);
+  }
 
   if (notesToRender.length === 0) {
     container.style.display = "flex";
@@ -115,7 +133,7 @@ function renderNotes(filteredNotes) {
     container.innerHTML = `
       <div class="empty-state">
         <img class="no-notes-image" src="assets/images/no-item.webp" alt="No Notes" />
-        <p>Create your first note to get started!</p>
+        <p>${currentFilter === "archived" ? "No archived notes found." : "Create your first note to get started!"}</p>
         <button class="add-note-btn" onclick="openNoteDialog()">
           <i class="ri-add-line"></i> Add Your First Note
         </button>
@@ -124,11 +142,8 @@ function renderNotes(filteredNotes) {
     return;
   }
 
-  // Create a copy for sorting to prevent mutation
-  const sortedNotes = [...notesToRender];
-
-  // Sort pinned first (top), then newest first
-  sortedNotes.sort((a, b) => {
+  // Sort pinned first, then newest first
+  const sortedNotes = [...notesToRender].sort((a, b) => {
     if (a.pinned && !b.pinned) return -1;
     if (!a.pinned && b.pinned) return 1;
     return new Date(b.createdAt) - new Date(a.createdAt);
@@ -165,14 +180,13 @@ function renderNotes(filteredNotes) {
             .join("")}
         </div>
         <div class="note-actions">
-          <button class="edit-btn" onclick="openNoteDialog('${
-            note.id
-          }')" title="Edit Note">
+          <button class="edit-btn" onclick="openNoteDialog('${note.id}')" title="Edit Note">
             <i class="ri-pencil-line"></i>
           </button>
-          <button class="delete-btn" onclick="deleteNote('${
-            note.id
-          }')" title="Delete Note">
+          <button class="edit-btn" onclick="toggleArchive('${note.id}')" title="${note.archived ? "Unarchive Note" : "Archive Note"}">
+            <i class="ri-archive-${note.archived ? "line" : "fill"}"></i>
+          </button>
+          <button class="delete-btn" onclick="deleteNote('${note.id}')" title="Delete Note">
             <i class="ri-delete-bin-6-line"></i>
           </button>
         </div>
@@ -186,7 +200,9 @@ function filterNotes(query) {
   const lowerQuery = query.toLowerCase().trim();
 
   return notes.filter((note) => {
-    if (note.archived) return false;
+    // Filter out archived notes when in 'all' mode, and vice versa handled in renderNotes()
+    if (note.archived && currentFilter === "all") return false;
+    if (!note.archived && currentFilter === "archived") return false;
 
     const searchableString = [note.title, note.content, note.keywords.join(" ")]
       .join(" ")
@@ -242,6 +258,23 @@ function applyStoredTheme() {
     document.body.classList.add("dark-theme");
   }
   updateThemeIcon();
+}
+
+function setFilter(filterType) {
+  currentFilter = filterType;
+
+  document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.classList.remove("active");
+  });
+
+  document
+    .querySelector(`.filter-btn[onclick="setFilter('${filterType}')"]`)
+    .classList.add("active");
+
+  // Clear search input on filter change
+  document.getElementById("searchInput").value = "";
+
+  renderNotes();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
