@@ -1,59 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet" />
-  <link rel="icon" type="image/x-icon" href="assets/images/logo/favicon.ico" />
-  <link rel="stylesheet" href="assets/css/styles.css" />
-  <script src="assets/js/script.js" defer></script>
-  <title>Quick Notes 42</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="assets/images/logo/favicon.ico"
+    />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <script src="assets/js/script.js" defer></script>
+    <title>Quick Notes 42</title>
+  </head>
 
-  <header>
-    <h1 class="header-title"> 
-      <img src="assets/images/logo/note-logo.png" alt="Quick Notes Logo" class="logo" />
-      Quick Notes 42
-    </h1>
-    <div class="header-actions">
-      <button class="add-note-btn" onclick="openNoteDialog()">
-        <i class="ri-add-line"></i> Add Note
-      </button>
-      <button id="themeToggleBtn" class="theme-toggle-btn">
-        <i class="ri-moon-line"></i>
-      </button>
-    </div>
-  </header>
-
-  <div id="mainWrapper" class="main-wrapper">
-    <main id="notesContainer" class="notes-grid"></main>
-  </div>
-
-  <dialog id="noteDialog">
-    <div class="dialog-content">
-      <div class="dialog-header">
-        <h2 class="dialog-title" id="dialogTitle">Add New Note</h2>
-        <button class="close-btn" onclick="closeNoteDialog()">&times;</button>
+  <body>
+    <header>
+      <h1 class="header-title">
+        <img
+          src="assets/images/logo/note-logo.png"
+          alt="Quick Notes Logo"
+          class="logo"
+        />
+        Quick Notes 42
+      </h1>
+      <div class="header-actions">
+        <button class="add-note-btn" onclick="openNoteDialog()">
+          <i class="ri-add-line"></i> Add Note
+        </button>
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Search notes..."
+          aria-label="Search notes"
+          class="search-input"
+        />
+        <button id="themeToggleBtn" class="theme-toggle-btn">
+          <i class="ri-moon-line"></i>
+        </button>
       </div>
-      <form id="noteForm">
-        <div class="form-group">
-          <label for="noteTitle" class="form-label">Title</label>
-          <input type="text" id="noteTitle" class="form-input" required />
-        </div>
-        <div class="form-group">
-          <label for="noteContent" class="form-label">Content</label>
-          <textarea id="noteContent" class="form-textarea" required></textarea>
-        </div>
-        <div class="dialog-actions">
-          <button type="button" class="cancel-btn" onclick="closeNoteDialog()">Cancel</button>
-          <button type="submit" class="save-btn">
-            <i class="ri-save-line"></i> Save Note
-          </button>
-        </div>
-      </form>
-    </div>
-  </dialog>
+    </header>
 
-</body>
+    <div id="mainWrapper" class="main-wrapper">
+      <main id="notesContainer" class="notes-grid"></main>
+    </div>
+
+    <dialog id="noteDialog">
+      <div class="dialog-content">
+        <div class="dialog-header">
+          <h2 class="dialog-title" id="dialogTitle">Add New Note</h2>
+          <button class="close-btn" onclick="closeNoteDialog()">&times;</button>
+        </div>
+        <form id="noteForm">
+          <div class="form-group">
+            <label for="noteTitle" class="form-label">Title</label>
+            <input type="text" id="noteTitle" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label for="noteContent" class="form-label">Content</label>
+            <textarea
+              id="noteContent"
+              class="form-textarea"
+              required
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label for="noteKeywords" class="form-label"
+              >Keywords (comma separated)</label
+            >
+            <input
+              type="text"
+              id="noteKeywords"
+              class="form-input"
+              placeholder="e.g. work, ideas, personal"
+            />
+          </div>
+          <div class="dialog-actions">
+            <button
+              type="button"
+              class="cancel-btn"
+              onclick="closeNoteDialog()"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="save-btn">
+              <i class="ri-save-line"></i> Save Note
+            </button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+
+    <div id="customAlert" class="custom-alert hidden">
+      <div class="custom-alert-box" id="customAlertBox">
+        <h3 id="alertTitle"></h3>
+        <p id="alertMessage"></p>
+        <button onclick="closeCustomAlert()">OK</button>
+      </div>
+    </div>
+  </body>
 </html>
