@@ -1,61 +1,117 @@
-let notes = []
-let editingNoteId = null
+let notes = [];
+let editingNoteId = null;
 
 function loadNotes() {
-  const savedNotes = localStorage.getItem('quickNotes')
-  return savedNotes ? JSON.parse(savedNotes) : []
+  const savedNotes = localStorage.getItem("quickNotes");
+  return savedNotes ? JSON.parse(savedNotes) : [];
+}
+
+function showCustomAlert(title, message) {
+  const alertBox = document.getElementById("customAlert");
+  document.getElementById("alertTitle").textContent = title;
+  document.getElementById("alertMessage").textContent = message;
+  alertBox.classList.remove("hidden");
+}
+
+function closeCustomAlert() {
+  document.getElementById("customAlert").classList.add("hidden");
 }
 
 function saveNote(event) {
-  event.preventDefault()
+  event.preventDefault();
 
-  const title = document.getElementById('noteTitle').value.trim()
-  const content = document.getElementById('noteContent').value.trim()
+  const title = document.getElementById("noteTitle").value.trim();
+  const content = document.getElementById("noteContent").value.trim();
+  const keywordsInput = document.getElementById("noteKeywords").value.trim();
+
+  const rawKeywords = keywordsInput
+    ? keywordsInput
+        .split(",")
+        .map((k) => k.trim().toLowerCase())
+        .filter(Boolean)
+    : [];
+
+  const uniqueKeywords = [...new Set(rawKeywords)];
+  const MAX_KEYWORDS = 5;
+
+  if (rawKeywords.length !== uniqueKeywords.length) {
+    showCustomAlert(
+      "Duplicate Keywords",
+      "You have entered duplicate keywords. Only unique keywords will be saved."
+    );
+  }
+
+  if (uniqueKeywords.length > MAX_KEYWORDS) {
+    showCustomAlert(
+      "Too Many Keywords",
+      `You can only add up to ${MAX_KEYWORDS} keywords. The first ${MAX_KEYWORDS} will be used.`
+    );
+    uniqueKeywords.splice(MAX_KEYWORDS);
+  }
+
+  const now = new Date().toISOString();
 
   if (editingNoteId) {
-    const noteIndex = notes.findIndex(note => note.id === editingNoteId)
+    const noteIndex = notes.findIndex((note) => note.id === editingNoteId);
     notes[noteIndex] = {
       ...notes[noteIndex],
       title,
-      content
-    }
+      content,
+      modifiedAt: now,
+      keywords: uniqueKeywords,
+    };
   } else {
     notes.unshift({
       id: generateId(),
       title,
-      content
-    })
+      content,
+      createdAt: now,
+      modifiedAt: now,
+      keywords: uniqueKeywords,
+      pinned: false, // Fixed: New notes are unpinned by default
+      archived: false,
+    });
   }
 
-  closeNoteDialog()
-  saveNotes()
-  renderNotes()
+  closeNoteDialog();
+  saveNotes();
+  renderNotes();
+  document.getElementById("searchInput").value = "";
 }
 
 function generateId() {
-  return Date.now().toString()
+  return Date.now().toString();
 }
 
 function saveNotes() {
-  localStorage.setItem('quickNotes', JSON.stringify(notes))
+  localStorage.setItem("quickNotes", JSON.stringify(notes));
 }
 
 function deleteNote(noteId) {
-  notes = notes.filter(note => note.id !== noteId)
-  saveNotes()
-  renderNotes()
+  notes = notes.filter((note) => note.id !== noteId);
+  saveNotes();
+  renderNotes();
 }
 
-function renderNotes() {
-  const container = document.getElementById('notesContainer')
-  const wrapper = document.getElementById('mainWrapper')
+function togglePin(noteId) {
+  const note = notes.find((n) => n.id === noteId);
+  if (note) {
+    note.pinned = !note.pinned;
+    note.modifiedAt = new Date().toISOString();
+    saveNotes();
+    renderNotes();
+  }
+}
 
-  if (notes.length === 0) {
-    // Switch to flex layout for empty state
-    container.style.display = 'flex'
-    container.style.flexDirection = 'column'
-    container.style.justifyContent = 'center'
-    container.style.alignItems = 'center'
+function renderNotes(filteredNotes) {
+  const container = document.getElementById("notesContainer");
+  const notesToRender = Array.isArray(filteredNotes) ? filteredNotes : notes;
+
+  if (notesToRender.length === 0) {
+    container.style.display = "flex";
+    container.style.flexDirection = "column";
+    container.style.justifyContent = "center";
+    container.style.alignItems = "center";
     container.innerHTML = `
       <div class="empty-state">
         <img class="no-notes-image" src="assets/images/no-item.webp" alt="No Notes" />
@@ -64,89 +120,169 @@ function renderNotes() {
           <i class="ri-add-line"></i> Add Your First Note
         </button>
       </div>
-    `
-  } else {
-    // Switch back to grid layout for displaying notes
-    container.style.display = 'grid'
-    container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))'
-    container.style.gap = '1.5rem'
-    container.style.alignItems = 'center'
-    container.style.justifyContent = 'center'
-    container.style.padding = '1rem'
+    `;
+    return;
+  }
 
-    container.innerHTML = notes.map(note => `
+  // Create a copy for sorting to prevent mutation
+  const sortedNotes = [...notesToRender];
+
+  // Sort pinned first (top), then newest first
+  sortedNotes.sort((a, b) => {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
+  container.style.display = "grid";
+  container.style.gridTemplateColumns = "repeat(auto-fill, minmax(350px, 1fr))";
+  container.style.gap = "1.5rem";
+  container.style.alignItems = "center";
+  container.style.justifyContent = "center";
+  container.style.padding = "1rem";
+
+  container.innerHTML = sortedNotes
+    .map(
+      (note) => `
       <div class="note-card">
-        <h3 class="note-title">${note.title}</h3>
-        <p class="note-content">${note.content}</p>
+        <div class="note-body">
+          <h3 class="note-title">
+            <i class="pin-icon ri-${
+              note.pinned ? "pushpin-fill" : "pushpin-line"
+            }" 
+            onclick="togglePin('${note.id}')" 
+            title="${note.pinned ? "Unpin Note" : "Pin Note"}"
+            style="cursor: pointer; margin-right: 0.5rem; vertical-align: middle;"></i>
+            ${note.title}
+          </h3>
+          <hr class="note-separator" />
+          <p class="note-content">${note.content}</p>
+        </div>
+
+        <div class="note-keywords">
+          ${note.keywords
+            .map((kw) => `<span class="keyword-tag">${kw}</span>`)
+            .join("")}
+        </div>
         <div class="note-actions">
-          <button class="edit-btn" onclick="openNoteDialog('${note.id}')" title="Edit Note">
+          <button class="edit-btn" onclick="openNoteDialog('${
+            note.id
+          }')" title="Edit Note">
             <i class="ri-pencil-line"></i>
           </button>
-          <button class="delete-btn" onclick="deleteNote('${note.id}')" title="Delete Note">
+          <button class="delete-btn" onclick="deleteNote('${
+            note.id
+          }')" title="Delete Note">
             <i class="ri-delete-bin-6-line"></i>
           </button>
         </div>
       </div>
-    `).join('')
-  }
+    `
+    )
+    .join("");
+}
+
+function filterNotes(query) {
+  const lowerQuery = query.toLowerCase().trim();
+
+  return notes.filter((note) => {
+    if (note.archived) return false;
+
+    const searchableString = [note.title, note.content, note.keywords.join(" ")]
+      .join(" ")
+      .toLowerCase();
+
+    return searchableString.includes(lowerQuery);
+  });
 }
 
 function openNoteDialog(noteId = null) {
-  const dialog = document.getElementById('noteDialog')
-  const titleInput = document.getElementById('noteTitle')
-  const contentInput = document.getElementById('noteContent')
+  const dialog = document.getElementById("noteDialog");
+  const titleInput = document.getElementById("noteTitle");
+  const contentInput = document.getElementById("noteContent");
+  const keywordsInput = document.getElementById("noteKeywords");
 
   if (noteId) {
-    const noteToEdit = notes.find(note => note.id === noteId)
-    editingNoteId = noteId
-    document.getElementById('dialogTitle').textContent = 'Edit Note'
-    titleInput.value = noteToEdit.title
-    contentInput.value = noteToEdit.content
+    const noteToEdit = notes.find((note) => note.id === noteId);
+    editingNoteId = noteId;
+    document.getElementById("dialogTitle").textContent = "Edit Note";
+    titleInput.value = noteToEdit.title;
+    contentInput.value = noteToEdit.content;
+    keywordsInput.value = noteToEdit.keywords.join(", ");
   } else {
-    editingNoteId = null
-    document.getElementById('dialogTitle').textContent = 'Add New Note'
-    titleInput.value = ''
-    contentInput.value = ''
+    editingNoteId = null;
+    document.getElementById("dialogTitle").textContent = "Add New Note";
+    titleInput.value = "";
+    contentInput.value = "";
+    keywordsInput.value = "";
   }
 
-  dialog.showModal()
-  titleInput.focus()
+  dialog.showModal();
+  titleInput.focus();
 }
 
 function closeNoteDialog() {
-  document.getElementById('noteDialog').close()
+  document.getElementById("noteDialog").close();
 }
 
 function updateThemeIcon() {
-  const isDark = document.body.classList.contains('dark-theme')
-  const themeBtn = document.getElementById('themeToggleBtn')
-  themeBtn.innerHTML = `<i class="ri-${isDark ? 'sun' : 'moon'}-line"></i>`
+  const isDark = document.body.classList.contains("dark-theme");
+  const themeBtn = document.getElementById("themeToggleBtn");
+  themeBtn.innerHTML = `<i class="ri-${isDark ? "sun" : "moon"}-line"></i>`;
 }
 
 function toggleTheme() {
-  const isDark = document.body.classList.toggle('dark-theme')
-  localStorage.setItem('theme', isDark ? 'dark' : 'light')
-  updateThemeIcon()
+  const isDark = document.body.classList.toggle("dark-theme");
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+  updateThemeIcon();
 }
 
 function applyStoredTheme() {
-  if (localStorage.getItem('theme') === 'dark') {
-    document.body.classList.add('dark-theme')
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark-theme");
   }
-  updateThemeIcon()
+  updateThemeIcon();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  notes = loadNotes()
-  renderNotes()
-  applyStoredTheme()
+document.addEventListener("DOMContentLoaded", () => {
+  notes = loadNotes();
+  renderNotes();
+  applyStoredTheme();
 
-  document.getElementById('noteForm').addEventListener('submit', saveNote)
-  document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme)
+  document.getElementById("noteForm").addEventListener("submit", saveNote);
+  document
+    .getElementById("themeToggleBtn")
+    .addEventListener("click", toggleTheme);
 
-  document.getElementById('noteDialog').addEventListener('click', (event) => {
+  document.getElementById("noteDialog").addEventListener("click", (event) => {
     if (event.target === event.currentTarget) {
-      closeNoteDialog()
+      closeNoteDialog();
     }
-  })
-})
+  });
+
+  document.getElementById("searchInput").addEventListener("input", (event) => {
+    const query = event.target.value.trim();
+    if (query === "") {
+      renderNotes();
+    } else {
+      const filtered = filterNotes(query);
+      renderNotes(filtered);
+    }
+  });
+
+  document.getElementById("customAlert").addEventListener("click", (event) => {
+    const box = document.getElementById("customAlertBox");
+    if (!box.contains(event.target)) {
+      closeCustomAlert();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      const alertBox = document.getElementById("customAlert");
+      if (!alertBox.classList.contains("hidden")) {
+        closeCustomAlert();
+      }
+    }
+  });
+});
