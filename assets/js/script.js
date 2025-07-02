@@ -9,8 +9,25 @@ function loadNotes() {
 
 function showCustomAlert(title, message) {
   const alertBox = document.getElementById("customAlert");
-  document.getElementById("alertTitle").textContent = title;
+  const alertTitle = document.getElementById("alertTitle");
+  const alertButton = document.getElementById("closeAlertBtn");
+
+  alertTitle.textContent = title;
   document.getElementById("alertMessage").textContent = message;
+
+  // Determine if it's an error or a success/info message
+  const isError = /error|duplicate|too many|failed|no notes/i.test(title);
+
+  if (isError) {
+    alertTitle.style.color = "#e74c3c";
+    alertButton.style.backgroundColor = "#e74c3c";
+    alertButton.classList.remove("blue-btn"); // REMOVE hover class for red
+  } else {
+    alertTitle.style.color = "#62a4e2";
+    alertButton.style.backgroundColor = "#62a4e2";
+    alertButton.classList.add("blue-btn"); // ADD hover class for blue
+  }
+
   alertBox.classList.remove("hidden");
 }
 
@@ -383,12 +400,12 @@ document
 
         if (newNotesCount === 0) {
           showCustomAlert(
-            "Import Result",
+            "Operation Failed",
             "No new notes were imported (all duplicates)."
           );
         } else {
           showCustomAlert(
-            "Import Result",
+            "Operation Succeeded",
             `${newNotesCount} note(s) imported successfully.`
           );
           saveNotes();
@@ -396,7 +413,7 @@ document
         }
       } catch (error) {
         showCustomAlert(
-          "Import Error",
+          "Operation Failed",
           "Failed to import notes: Invalid JSON file."
         );
       }
