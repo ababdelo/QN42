@@ -151,8 +151,8 @@ function renderNotes(filteredNotes) {
       <div class="empty-state">
         <img class="no-notes-image" src="assets/images/no-item.webp" alt="No Notes" />
         <p>${currentFilter === "archived"
-        ? "No archived notes found."
-        : "Create your first note to get started!"
+        ? "<h1>No archived notes found.</h1><br> Create a new note, or archive some existing notes!"
+        : "<h1>No notes found.</h1><br> Create your first note to get started!"
       }</p>
         <button class="add-note-btn" onclick="openNoteDialog()">
           <i class="ri-add-line"></i> Add Your First Note

@@ -12,6 +12,7 @@
   --base-color: #f2f4f8;
   --surface-color: #fff;
   --text-color: #191b23;
+  --title-text-color: #555A6E;
   --secondary-text-color: #3c404f;
   --base-transparent-90: rgba(247, 247, 247, 0.9);
   --base-transparent-100: rgba(247, 247, 247, 1);
@@ -25,6 +26,7 @@
   --base-color: #1e1f26;
   --surface-color: #2c2f38;
   --text-color: #f0f0f0;
+  --title-text-color: #d0d3e0;
   --secondary-text-color: #b0b3c0;
   --base-transparent-90: rgba(30, 31, 38, 0.9);
   --base-transparent-100: rgba(30, 31, 38, 1);
@@ -65,7 +67,7 @@ header {
 .header-title {
   font-size: 1.75rem;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--title-text-color);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -122,7 +124,7 @@ header {
   flex-grow: 1;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   height: calc(100vh - 4rem);
   overflow-y: auto;
   width: 100%;
@@ -512,8 +514,8 @@ dialog::backdrop {
 }
 
 .no-notes-image {
-  width: 150%;
-  height: auto;
+  width: 300px;
+  height: 233px;
   margin-bottom: 1rem;
   filter: drop-shadow(0 0 2px var(--img-shadow));
 }
