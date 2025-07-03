@@ -1,103 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet" />
-  <link rel="icon" type="image/x-icon" href="assets/images/logo/favicon.ico" />
-  <link rel="stylesheet" href="assets/css/styles.css" />
-  <script src="assets/js/script.js" defer></script>
-  <title>Quick Notes 42</title>
-</head>
-
-<body>
-  <header>
-    <h1 class="header-title">
-      <img src="assets/images/logo/note-logo.png" alt="Quick Notes Logo" class="logo" />
-      QN42
-    </h1>
-    <div class="header-actions">
-
-
-      <button id="exportNotesBtn" class="export-import-btn" title="Export Notes">
-        <i class="ri-download-cloud-2-line"></i> Export
-      </button>
-
-      <input type="file" id="importNotesInput" accept="application/json" style="display: none" />
-
-      <button class="add-note-btn" onclick="openNoteDialog()">
-        <i class="ri-add-large-line"></i> Add Note
-      </button>
-
-      <button id="importNotesBtn" class="export-import-btn" title="Import Notes">
-        <i class="ri-upload-cloud-2-line"></i> Import
-      </button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="assets/images/logo/favicon-blue.ico" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <script src="assets/js/script.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Quick Notes 42</title>
+  </head>
+  <body>
+    <header>
       <div class="search-wrapper">
-        <input type="search" id="searchInput" placeholder="Search notes..." aria-label="Search notes"
-          class="search-input" />
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Search notes..."
+          aria-label="Search notes"
+          class="search-input"
+        />
         <i class="ri-search-2-line search-icon"></i>
       </div>
-
-      <button id="themeToggleBtn" class="theme-toggle-btn">
+      <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle Dark/Light Mode">
         <i class="ri-moon-line"></i>
       </button>
+    </header>
+    <div id="mainWrapper" class="main-wrapper">
+      <aside class="sidebar">
+        <h1 class="header-title">
+          <div class="title-main-row">
+            <img id="appLogo" src="assets/images/logo/note-logo-blue.png" alt="Quick Notes Logo" class="logo" />
+            <span class="main-title">QN42</span>
+          </div>
+          <div class="header-subtitle">Your quick note-taking app</div>
+        </h1>
+        <div class="sidebar-section">
+          <h3 class="sidebar-section-title">Actions</h3>
+          <button class="add-note-btn" onclick="openNoteDialog()">
+            <i class="ri-add-large-line"></i> Add New Note
+          </button>
+          <button id="exportNotesBtn" class="export-import-btn" title="Export Notes">
+            <i class="ri-download-line"></i> Export Notes
+          </button>
+          <input type="file" id="importNotesInput" accept="application/json" style="display: none" />
+          <button id="importNotesBtn" class="export-import-btn" title="Import Notes">
+            <i class="ri-upload-line"></i> Import Notes
+          </button>
+          <button id="deleteAllNotesBtn" class="delete-all-btn" title="Delete All Notes">
+            <i class="ri-delete-bin-line"></i> Delete All Notes
+          </button>
+        </div>
+        <div class="sidebar-section">
+          <h3 class="sidebar-section-title">Panels</h3>
+          <div class="filter-tabs">
+            <button class="filter-btn active" onclick="setFilter('all')">
+              Active Notes <i class="ri-menu-line"></i>
+            </button>
+            <button class="filter-btn" onclick="setFilter('archived')">
+              Archived Notes <i class="ri-archive-line"></i>
+            </button>
+            <button class="filter-btn" onclick="setFilter('statistics')">
+              Notes Statistics <i class="ri-bar-chart-line"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3 class="sidebar-section-title">Theme Colors</h3>
+          <div class="color-palette">
+            <div class="color-circle blue active" data-color="#4194e2" title="Blue"></div>
+            <div class="color-circle orange" data-color="#F5871E" title="Orange"></div>
+            <div class="color-circle yellow" data-color="#FCC419" title="Yellow"></div>
+            <div class="color-circle green" data-color="#83C70E" title="Green"></div>
+            <div class="color-circle purple" data-color="#CC5DE8" title="Purple"></div>
+            <div class="color-circle pink" data-color="#ED64C8" title="Pink"></div>
+          </div>
+        </div>
+      </aside>
+      <main id="notesContainer" class="notes-grid"></main>
     </div>
-
-    <!-- Archive filter tabs -->
-    <div class="filter-tabs">
-      <button class="filter-btn active" onclick="setFilter('all')">
-        All Notes <i class="ri-sticky-note-fill"></i>
-      </button>
-      <button class="filter-btn" onclick="setFilter('archived')">
-        Archived <i class="ri-archive-drawer-fill"></i>
-      </button>
-    </div>
-  </header>
-
-  <div id="mainWrapper" class="main-wrapper">
-    <main id="notesContainer" class="notes-grid"></main>
-  </div>
-
-  <dialog id="noteDialog">
-    <div class="dialog-content">
-      <div class="dialog-header">
-        <h2 class="dialog-title" id="dialogTitle">Add New Note</h2>
-        <button class="close-btn" onclick="closeNoteDialog()">&times;</button>
+    <dialog id="noteDialog">
+      <div class="dialog-content">
+        <div class="dialog-header">
+          <h2 class="dialog-title" id="dialogTitle">Add New Note</h2>
+          <button class="close-btn" onclick="closeNoteDialog()">&times;</button>
+        </div>
+        <form id="noteForm">
+          <div class="form-group">
+            <label for="noteTitle" class="form-label">Title</label>
+            <input type="text" id="noteTitle" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label for="noteContent" class="form-label">Content</label>
+            <textarea id="noteContent" class="form-textarea" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="noteKeywords" class="form-label">Keywords (comma separated)</label>
+            <input
+              type="text"
+              id="noteKeywords"
+              class="form-input"
+              placeholder="e.g. work, ideas, personal"
+            />
+          </div>
+          <div class="dialog-actions">
+            <button type="button" class="cancel-btn" onclick="closeNoteDialog()">Cancel</button>
+            <button type="submit" class="save-btn"><i class="ri-save-line"></i> Save Note</button>
+          </div>
+        </form>
       </div>
-      <form id="noteForm">
-        <div class="form-group">
-          <label for="noteTitle" class="form-label">Title</label>
-          <input type="text" id="noteTitle" class="form-input" required />
+    </dialog>
+    <div id="customAlert" class="custom-alert hidden">
+      <div class="custom-alert-box" id="customAlertBox">
+        <h3 id="alertTitle"></h3>
+        <p id="alertMessage"></p>
+        <div class="alert-buttons">
+          <button id="confirmAlertBtn" class="alert-btn confirm">Confirm</button>
+          <button id="cancelAlertBtn" class="alert-btn cancel">Cancel</button>
         </div>
-        <div class="form-group">
-          <label for="noteContent" class="form-label">Content</label>
-          <textarea id="noteContent" class="form-textarea" required></textarea>
-        </div>
-        <div class="form-group">
-          <label for="noteKeywords" class="form-label">Keywords (comma separated)</label>
-          <input type="text" id="noteKeywords" class="form-input" placeholder="e.g. work, ideas, personal" />
-        </div>
-        <div class="dialog-actions">
-          <button type="button" class="cancel-btn" onclick="closeNoteDialog()">
-            Cancel
-          </button>
-          <button type="submit" class="save-btn">
-            <i class="ri-save-line"></i> Save Note
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
-  </dialog>
-
-  <div id="customAlert" class="custom-alert hidden">
-    <div class="custom-alert-box" id="customAlertBox">
-      <h3 id="alertTitle"></h3>
-      <p id="alertMessage"></p>
-      <button id="closeAlertBtn" onclick="closeCustomAlert()">OK</button>
-    </div>
-  </div>
-
-</body>
-
+  </body>
 </html>
