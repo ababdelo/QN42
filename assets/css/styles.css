@@ -16,7 +16,8 @@
   --base-transparent-100: rgba(247, 247, 247, 1);
   --img-shadow: rgba(0, 0, 0, 0.5);
   --notes-shadow: rgba(0, 0, 0, 0.2);
-  --sidebar-width: 280px;
+  --sidebar-expanded-width: 280px;
+  --sidebar-collapsed-width: 80px;
   --header-height: 60px;
   --note-card-height: 350px;
 }
@@ -110,9 +111,9 @@ body {
 header {
   position: fixed;
   top: 10px;
-  left: calc(var(--sidebar-width) + 2rem);
+  left: calc(var(--sidebar-expanded-width) + 2rem);
   height: var(--header-height);
-  width: calc(100% - var(--sidebar-width) - 4rem);
+  width: calc(100% - var(--sidebar-expanded-width) - 4rem);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -159,6 +160,26 @@ header {
   font-size: 1.2rem;
 }
 
+.sidebar-toggle-btn {
+  background: var(--surface-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 50%;
+  margin-left: 10px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-toggle-btn:hover {
+  background: var(--brand-color);
+  color: white;
+}
+
 .theme-toggle-btn {
   width: 42px;
   height: 42px;
@@ -185,7 +206,7 @@ header {
   top: 10px;
   border-radius: 15px;
   left: 10px;
-  width: var(--sidebar-width);
+  width: var(--sidebar-expanded-width);
   height: calc(100vh - 20px);
   background: var(--surface-color);
   border-right: 1px solid var(--base-transparent-90);
@@ -199,8 +220,161 @@ header {
   z-index: 100;
 }
 
+.sidebar.collapsed {
+  width: var(--sidebar-collapsed-width);
+  padding: 1rem 0.5rem;
+  align-items: center;
+  overflow: hidden;
+}
+
+.sidebar.collapsed .header-title .main-title,
+.sidebar.collapsed .header-subtitle,
+.sidebar.collapsed .sidebar button span,
+.sidebar.collapsed .filter-btn span {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-section-title {
+  font-size: 0.7rem;
+  justify-content: center;
+}
+
+.sidebar.collapsed .add-note-btn,
+.sidebar.collapsed .export-import-btn,
+.sidebar.collapsed .delete-all-btn,
+.sidebar.collapsed .filter-btn {
+  justify-content: center;
+  padding: 0.75rem 0.5rem;
+}
+
+.sidebar.collapsed .sidebar-section {
+  margin-top: 0.5rem;
+}
+
+.sidebar.collapsed .add-note-btn span,
+.sidebar.collapsed .export-import-btn span,
+.sidebar.collapsed .delete-all-btn span,
+.sidebar.collapsed .filter-btn span {
+  display: none;
+}
+
+.sidebar.collapsed button,
+.sidebar.collapsed .filter-btn {
+  width: 100%;
+  height: 35px;
+  padding: 0.75rem;
+  justify-content: center;
+}
+
+.sidebar.collapsed button i {
+  font-size: 1rem;
+}
+
+.sidebar.collapsed .color-circle {
+  width: 24px;
+  height: 24px;
+}
+
+.sidebar.collapsed .color-palette {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.sidebar {
+  transition: width 0.3s ease, padding 0.3s ease;
+  overflow: hidden;
+}
+
+.notes-grid {
+  transition: all 0.3s ease;
+}
+
+.main-wrapper {
+  transition: margin-left 0.3s ease, padding-left 0.3s ease;
+}
+
+header {
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.sidebar * {
+  transition: all 0.3s ease;
+}
+
+.sidebar.collapsed .main-title,
+.sidebar.collapsed .header-subtitle,
+.sidebar.collapsed .sidebar button span,
+.sidebar.collapsed .filter-btn span {
+  opacity: 0;
+  transform: translateX(-10px);
+  visibility: hidden;
+  pointer-events: none;
+  max-width: 0;
+  overflow: hidden;
+}
+
+.sidebar.collapsed .sidebar-section-title {
+  justify-content: center;
+  font-size: 0.7rem;
+  padding-bottom: 0.25rem;
+}
+
+.sidebar.collapsed .add-note-btn,
+.sidebar.collapsed .export-import-btn,
+.sidebar.collapsed .delete-all-btn,
+.sidebar.collapsed .filter-btn {
+  justify-content: center;
+  padding: 0.75rem 0.5rem;
+}
+
+.sidebar.collapsed .sidebar-section {
+  margin-top: 0.5rem;
+}
+
+.sidebar.collapsed button,
+.sidebar.collapsed .filter-btn {
+  width: 100%;
+  height: 35px;
+  padding: 0.75rem;
+  justify-content: center;
+}
+
+.sidebar.collapsed button i {
+  font-size: 1rem;
+}
+
+.sidebar.collapsed .color-circle {
+  width: 24px;
+  height: 24px;
+}
+
+.sidebar.collapsed .color-palette {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.sidebar:not(.collapsed) .main-title,
+.sidebar:not(.collapsed) .header-subtitle,
+.sidebar:not(.collapsed) .sidebar button span,
+.sidebar:not(.collapsed) .filter-btn span {
+  opacity: 1;
+  transform: translateX(0);
+  visibility: visible;
+  max-width: 100%;
+  pointer-events: auto;
+}
+
 .sidebar-section {
   margin-top: 1rem;
+}
+
+.header-title .logo {
+  width: 42px;
+  height: 42px;
 }
 
 .sidebar-section-title {
@@ -211,13 +385,22 @@ header {
   letter-spacing: 0.5px;
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--base-transparent-90);
   display: flex;
   align-items: center;
 }
 
 .sidebar-section button {
   margin-bottom: 0.75rem;
+}
+
+.main-wrapper.sidebar-collapsed {
+  margin-left: var(--header-height);
+  padding-left: calc(var(--header-height));
+}
+
+header.sidebar-collapsed {
+  left: calc(var(--header-height) + 4rem);
+  width: calc(100% - var(--header-height) - 6rem);
 }
 
 .filter-tabs {
@@ -344,16 +527,6 @@ header {
   color: white;
 }
 
-.sidebar-section-title {
-  color: var(--secondary-text-color);
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.25rem;
-  border-bottom: 1px solid var(--base-transparent-90);
-}
-
 .filter-tabs {
   display: flex;
   flex-direction: column;
@@ -426,7 +599,7 @@ button i {
 }
 
 .main-wrapper {
-  margin-left: var(--sidebar-width);
+  margin-left: var(--sidebar-expanded-width);
   padding: 1rem 2rem 2rem 2rem;
   flex-grow: 1;
   overflow: visible;
@@ -453,28 +626,21 @@ button i {
 
 .notes-grid::-webkit-scrollbar {
   width: 8px;
-  /* Width of the scrollbar */
 }
 
 .notes-grid::-webkit-scrollbar-track {
   background: var(--surface-color);
-  /* Color of the scrollbar track */
   border-radius: 10px;
 }
 
 .notes-grid::-webkit-scrollbar-thumb {
   background-color: var(--brand-color);
-  /* Color of the scrollbar thumb, matching brand color */
   border-radius: 10px;
-  /* Rounded corners for the thumb */
   border: 2px solid var(--surface-color);
-  /* Border around the thumb, matching track background */
 }
 
-/* You can also style the thumb on hover if you like */
 .notes-grid::-webkit-scrollbar-thumb:hover {
   background-color: var(--brand-hover-color);
-  /* Darker shade on hover */
 }
 
 .note-card {
