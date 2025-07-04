@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <meta name="description"
     content="Quick Notes 42: Your personal, fast, and customizable note-taking web application with dynamic themes and statistics." />
   <meta name="keywords"
@@ -20,18 +19,21 @@
   <meta property="og:locale" content="en_US" />
   <link rel="icon" type="image/x-icon" href="assets/images/logo/favicon-blue.ico" />
   <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400..800&family=Gugi&family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
-    rel="stylesheet">
+    rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <script src="assets/js/script.js" defer></script>
   <title>Quick Notes 42</title>
 </head>
 
 <body>
-  <header>
+  <header id="headerBar" class="header-bar">
+    <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Toggle Sidebar">
+      <i class="ri-menu-fill"></i>
+    </button>
     <div class="search-wrapper">
       <input type="search" id="searchInput" placeholder="Search notes..." aria-label="Search notes"
         class="search-input" />
@@ -53,36 +55,35 @@
       <div class="sidebar-section">
         <h3 class="sidebar-section-title">Actions</h3>
         <button class="add-note-btn" onclick="openNoteDialog()">
-          <i class="ri-add-large-line"></i> Add New Note
+          <i class="ri-add-large-line"></i> <span>Add New Note</span>
         </button>
         <button id="exportNotesBtn" class="export-import-btn" title="Export Notes">
-          <i class="ri-download-line"></i> Export Notes
+          <i class="ri-download-line"></i> <span>Export Notes</span>
         </button>
         <input type="file" id="importNotesInput" accept="application/json" style="display: none" />
         <button id="importNotesBtn" class="export-import-btn" title="Import Notes">
-          <i class="ri-upload-line"></i> Import Notes
+          <i class="ri-upload-line"></i> <span>Import Notes</span>
         </button>
         <button id="deleteAllNotesBtn" class="delete-all-btn" title="Delete All Notes">
-          <i class="ri-delete-bin-line"></i> Delete All Notes
+          <i class="ri-delete-bin-line"></i> <span>Delete All Notes</span>
         </button>
       </div>
       <div class="sidebar-section">
         <h3 class="sidebar-section-title">Panels</h3>
         <div class="filter-tabs">
           <button class="filter-btn active" onclick="setFilter('all')">
-            Active Notes <i class="ri-menu-line"></i>
+            <span>Active Notes </span> <i class="ri-menu-line"></i>
           </button>
           <button class="filter-btn" onclick="setFilter('archived')">
-            Archived Notes <i class="ri-archive-line"></i>
+            <span>Archived Notes </span> <i class="ri-archive-line"></i>
           </button>
           <button class="filter-btn" onclick="setFilter('statistics')">
-            Notes Statistics <i class="ri-bar-chart-line"></i>
+            <span>Notes Statistics </span> <i class="ri-bar-chart-line"></i>
           </button>
         </div>
       </div>
-
       <div class="sidebar-section">
-        <h3 class="sidebar-section-title">Theme Colors</h3>
+        <h3 class="sidebar-section-title">Theme</h3>
         <div class="color-palette">
           <div class="color-circle blue active" data-color="#4194e2" title="Blue"></div>
           <div class="color-circle orange" data-color="#F5871E" title="Orange"></div>
@@ -115,8 +116,12 @@
           <input type="text" id="noteKeywords" class="form-input" placeholder="e.g. work, ideas, personal" />
         </div>
         <div class="dialog-actions">
-          <button type="button" class="cancel-btn" onclick="closeNoteDialog()">Cancel</button>
-          <button type="submit" class="save-btn"><i class="ri-save-line"></i> Save Note</button>
+          <button type="button" class="cancel-btn" onclick="closeNoteDialog()">
+            Cancel
+          </button>
+          <button type="submit" class="save-btn">
+            <i class="ri-save-line"></i> Save Note
+          </button>
         </div>
       </form>
     </div>
@@ -126,7 +131,9 @@
       <h3 id="alertTitle"></h3>
       <p id="alertMessage"></p>
       <div class="alert-buttons">
-        <button id="confirmAlertBtn" class="alert-btn confirm">Confirm</button>
+        <button id="confirmAlertBtn" class="alert-btn confirm">
+          Confirm
+        </button>
         <button id="cancelAlertBtn" class="alert-btn cancel">Cancel</button>
       </div>
     </div>
