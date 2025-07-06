@@ -115,23 +115,84 @@ header {
   height: var(--header-height);
   width: calc(100% - var(--sidebar-expanded-width) - 4rem);
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  /* Stack children vertically by default */
+  justify-content: flex-start;
+  align-items: flex-start;
   background: var(--surface-color);
   border-bottom: 1px solid var(--base-transparent-90);
   border-radius: 15px;
   flex-shrink: 0;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
-  z-index: 150;
+  z-index: 2001;
+  transition: width 0.3s ease, left 0.3s ease, height 0.3s ease, padding 0.3s ease;
+  padding: 0 1rem;
+  /* Add horizontal padding to the header */
+}
+
+.header-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  /* Take full width of the header */
+  height: var(--header-height);
+  /* Maintain height for top row */
+  flex-shrink: 0;
+  /* Prevent shrinking */
+}
+
+header.is-expanded {
+  height: auto;
+  padding-bottom: 1rem;
+  /* Add padding at the bottom when expanded */
+  /* flex-direction: column and align-items: flex-start are already on header */
+  gap: 1rem;
+  /* Space between header-top-row and header-expanded-content-wrapper */
+}
+
+.header-expanded-content-wrapper {
+  display: none;
+  /* Hidden by default */
+  width: 100%;
+  /* Take full width of the header */
+  flex-direction: column;
+  /* Stack sections vertically */
+  gap: 1.5rem;
+  /* Space between sidebar sections */
+  overflow-y: auto;
+  /* Enable scrolling if content overflows */
+  max-height: calc(100vh - var(--header-height) - 4rem);
+  /* Limit height */
+  /* No padding-top here as gap will handle spacing from header-top-row */
+}
+
+header.is-expanded .header-expanded-content-wrapper {
+  display: flex;
+  /* Show when header is expanded */
+}
+
+.overlay-blur {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 1000;
 }
 
 .search-wrapper {
-  margin-left: 10px;
   position: relative;
   width: 350px;
   max-width: 100%;
   border: 2px solid var(--base-transparent-90);
   border-radius: 0.5rem;
+  flex-grow: 1;
+  /* Allow search wrapper to grow */
+  margin: 0 10px;
+  /* Space between buttons and search */
 }
 
 .search-input {
@@ -165,7 +226,6 @@ header {
   color: var(--text-color);
   border: none;
   border-radius: 50%;
-  margin-left: 10px;
   width: 42px;
   height: 42px;
   display: flex;
@@ -184,7 +244,6 @@ header {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  margin-right: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -218,6 +277,7 @@ header {
   overflow-y: auto;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
   z-index: 100;
+  transition: width 0.3s ease, padding 0.3s ease, all 0.3s ease;
 }
 
 .sidebar.collapsed {
@@ -237,18 +297,6 @@ header {
 .sidebar.collapsed .sidebar-section-title {
   font-size: 0.7rem;
   justify-content: center;
-}
-
-.sidebar.collapsed .add-note-btn,
-.sidebar.collapsed .export-import-btn,
-.sidebar.collapsed .delete-all-btn,
-.sidebar.collapsed .filter-btn {
-  justify-content: center;
-  padding: 0.75rem 0.5rem;
-}
-
-.sidebar.collapsed .sidebar-section {
-  margin-top: 0.5rem;
 }
 
 .sidebar.collapsed .add-note-btn span,
@@ -282,27 +330,6 @@ header {
   align-items: center;
 }
 
-.sidebar {
-  transition: width 0.3s ease, padding 0.3s ease;
-  overflow: hidden;
-}
-
-.notes-grid {
-  transition: all 0.3s ease;
-}
-
-.main-wrapper {
-  transition: margin-left 0.3s ease, padding-left 0.3s ease;
-}
-
-header {
-  transition: width 0.3s ease, left 0.3s ease;
-}
-
-.sidebar * {
-  transition: all 0.3s ease;
-}
-
 .sidebar.collapsed .main-title,
 .sidebar.collapsed .header-subtitle,
 .sidebar.collapsed .sidebar button span,
@@ -321,40 +348,8 @@ header {
   padding-bottom: 0.25rem;
 }
 
-.sidebar.collapsed .add-note-btn,
-.sidebar.collapsed .export-import-btn,
-.sidebar.collapsed .delete-all-btn,
-.sidebar.collapsed .filter-btn {
-  justify-content: center;
-  padding: 0.75rem 0.5rem;
-}
-
 .sidebar.collapsed .sidebar-section {
   margin-top: 0.5rem;
-}
-
-.sidebar.collapsed button,
-.sidebar.collapsed .filter-btn {
-  width: 100%;
-  height: 35px;
-  padding: 0.75rem;
-  justify-content: center;
-}
-
-.sidebar.collapsed button i {
-  font-size: 1rem;
-}
-
-.sidebar.collapsed .color-circle {
-  width: 24px;
-  height: 24px;
-}
-
-.sidebar.collapsed .color-palette {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
 
 .sidebar:not(.collapsed) .main-title,
@@ -383,7 +378,6 @@ header {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -391,6 +385,19 @@ header {
 
 .sidebar-section button {
   margin-bottom: 0.75rem;
+}
+
+.main-wrapper {
+  margin-left: var(--sidebar-expanded-width);
+  padding: 1rem 2rem 2rem 2rem;
+  flex-grow: 1;
+  overflow: visible;
+  height: calc(100vh - var(--header-height) - 2rem);
+  background: var(--base-color);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  transition: margin-left 0.3s ease, padding-left 0.3s ease;
 }
 
 .main-wrapper.sidebar-collapsed {
@@ -401,10 +408,6 @@ header {
 header.sidebar-collapsed {
   left: calc(var(--header-height) + 4rem);
   width: calc(100% - var(--header-height) - 6rem);
-}
-
-.filter-tabs {
-  margin-top: 0.5rem;
 }
 
 .header-title {
@@ -450,7 +453,6 @@ header.sidebar-collapsed {
 .sidebar .filter-tabs {
   width: 100%;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
 }
 
 .add-note-btn,
@@ -505,7 +507,7 @@ header.sidebar-collapsed {
   background-color: var(--surface-color);
   color: var(--text-color);
   border: 2px solid var(--brand-color);
-  padding: 0.5rem 0;
+  padding: 0.75rem;
   border-radius: 0.5rem;
   cursor: pointer;
   font-weight: 600;
@@ -514,7 +516,6 @@ header.sidebar-collapsed {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
 }
 
 .filter-btn:hover {
@@ -522,15 +523,52 @@ header.sidebar-collapsed {
   color: white;
 }
 
-.filter-btn.active {
-  background-color: var(--brand-color);
+.filter-btn:not(.active):hover {
+  background-color: var(--brand-hover-color);
   color: white;
 }
 
-.filter-tabs {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.filter-btn:focus {
+  outline: none;
+}
+
+.filter-btn.active {
+  background-color: var(--brand-color) !important;
+  color: white !important;
+}
+
+.filter-btn.active:hover {
+  background-color: var(--brand-color) !important;
+  color: white !important;
+}
+
+.filter-btn.active:focus {
+  background-color: var(--brand-color) !important;
+  color: white !important;
+}
+
+.filter-btn.active:active {
+  background-color: var(--brand-color) !important;
+  color: white !important;
+}
+
+/* Extra specificity for sidebar states */
+.sidebar .filter-btn.active,
+.header-expanded-content-wrapper .filter-btn.active {
+  background-color: var(--brand-color) !important;
+  color: white !important;
+}
+
+.sidebar .filter-btn.active:hover,
+.header-expanded-content-wrapper .filter-btn.active:hover {
+  background-color: var(--brand-color) !important;
+  color: white !important;
+}
+
+.sidebar .filter-btn.active:focus,
+.header-expanded-content-wrapper .filter-btn.active:focus {
+  background-color: var(--brand-color) !important;
+  color: white !important;
 }
 
 .stats-view.active {
@@ -538,6 +576,7 @@ header.sidebar-collapsed {
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
+  margin-top: 10rem;
   gap: 2rem;
   width: 100%;
   max-width: 1000px;
@@ -622,6 +661,7 @@ button i {
   height: calc(100vh - var(--header-height) - 2rem);
   overflow-y: auto;
   box-sizing: border-box;
+  transition: all 0.3s ease;
 }
 
 .notes-grid::-webkit-scrollbar {
@@ -1067,7 +1107,6 @@ dialog::backdrop {
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
-  margin-top: 1rem;
 }
 
 .color-circle {
@@ -1110,4 +1149,125 @@ dialog::backdrop {
 
 .color-circle.pink {
   background-color: #ed64c8;
+}
+
+@media screen and (max-width: 550px) {
+  .sidebar {
+    display: none !important;
+  }
+
+  .main-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  header {
+    left: 10px !important;
+    width: calc(100% - 20px) !important;
+    transition: all 0.3s ease;
+    z-index: 2001;
+    /* Default header properties for mobile */
+    flex-direction: column;
+    /* Stack children (top row and expanded content) */
+    align-items: flex-start;
+    padding: 0 1rem;
+    /* Ensure padding on header */
+  }
+
+  /* Header always has its children stacked vertically,
+     but .header-top-row keeps its children (buttons, search) horizontal */
+  header.is-expanded {
+    height: auto;
+    padding-bottom: 1rem;
+    /* Adjust padding for expanded content */
+    gap: 1rem;
+    /* Space between header-top-row and header-expanded-content-wrapper */
+  }
+
+  .header-top-row {
+    height: var(--header-height);
+    /* Ensure top row maintains its height */
+  }
+
+  .notes-grid {
+    margin-top: calc(var(--header-height) + 2rem);
+  }
+
+  /* Adjust styles for sidebar sections when moved to header */
+  .header-expanded-content-wrapper .sidebar-section,
+  .header-expanded-content-wrapper .filter-tabs {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0;
+  }
+
+  .header-expanded-content-wrapper .sidebar-section-title {
+    padding-bottom: 0.5rem;
+    justify-content: flex-start;
+  }
+
+  .header-expanded-content-wrapper button {
+    width: 75%;
+    justify-content: space-between;
+    padding-left: 1rem;
+  }
+
+  .header-expanded-content-wrapper .color-palette {
+    justify-content: flex-start;
+  }
+
+  .sidebar-toggle-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0.5rem;
+    margin-right: 5px;
+  }
+
+  .theme-toggle-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0.5rem;
+    margin-left: 5px;
+  }
+
+  .color-circle {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 5px;
+  }
+}
+
+@media screen and (max-width: 375px) {
+
+  .notes-grid {
+    overflow-x: hidden;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .notes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    padding: 0.5rem;
+  }
+
+  .note-card {
+    width: 300px;
+    margin: 0 auto;
+    /* Added for horizontal centering */
+  }
+
+  .note-content {
+    max-height: 120px;
+  }
+
+  .note-title {
+    font-size: 1.1rem;
+  }
+
+  .stat-number {
+    font-size: 1.5rem;
+  }
 }

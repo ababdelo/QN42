@@ -31,17 +31,63 @@
 
 <body>
   <header id="headerBar" class="header-bar">
-    <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Toggle Sidebar">
-      <i class="ri-menu-fill"></i>
-    </button>
-    <div class="search-wrapper">
-      <input type="search" id="searchInput" placeholder="Search notes..." aria-label="Search notes"
-        class="search-input" />
-      <i class="ri-search-2-line search-icon"></i>
+    <div class="header-top-row">
+      <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Toggle Sidebar">
+        <i class="ri-menu-line"></i>
+      </button>
+      <div class="search-wrapper">
+        <input type="search" id="searchInput" placeholder="Search notes..." aria-label="Search notes"
+          class="search-input" />
+        <i class="ri-search-2-line search-icon"></i>
+      </div>
+      <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle Dark/Light Mode">
+        <i class="ri-moon-line"></i>
+      </button>
     </div>
-    <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle Dark/Light Mode">
-      <i class="ri-moon-line"></i>
-    </button>
+
+    <div id="headerExpandedContent" class="header-expanded-content-wrapper">
+      <div class="sidebar-section">
+        <h3 class="sidebar-section-title">Actions</h3>
+        <button class="add-note-btn" onclick="openNoteDialog()">
+          <i class="ri-add-large-line"></i> <span>Add New Note</span>
+        </button>
+        <button id="exportNotesBtn" class="export-import-btn" title="Export Notes">
+          <i class="ri-download-line"></i> <span>Export Notes</span>
+        </button>
+        <input type="file" id="importNotesInput" accept="application/json" style="display: none" />
+        <button id="importNotesBtn" class="export-import-btn" title="Import Notes">
+          <i class="ri-upload-line"></i> <span>Import Notes</span>
+        </button>
+        <button id="deleteAllNotesBtn" class="delete-all-btn" title="Delete All Notes">
+          <i class="ri-delete-bin-line"></i> <span>Delete All Notes</span>
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <h3 class="sidebar-section-title">Panels</h3>
+        <div class="filter-tabs">
+          <button class="filter-btn active" onclick="setFilter('all')">
+            <span>Active Notes </span> <i class="ri-menu-line"></i>
+          </button>
+          <button class="filter-btn" onclick="setFilter('archived')">
+            <span>Archived Notes </span> <i class="ri-archive-line"></i>
+          </button>
+          <button class="filter-btn" onclick="setFilter('statistics')">
+            <span>Notes Statistics </span> <i class="ri-bar-chart-line"></i>
+          </button>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <h3 class="sidebar-section-title">Theme</h3>
+        <div class="color-palette">
+          <div class="color-circle blue active" data-color="#4194e2" title="Blue"></div>
+          <div class="color-circle orange" data-color="#F5871E" title="Orange"></div>
+          <div class="color-circle yellow" data-color="#FCC419" title="Yellow"></div>
+          <div class="color-circle green" data-color="#83C70E" title="Green"></div>
+          <div class="color-circle purple" data-color="#CC5DE8" title="Purple"></div>
+          <div class="color-circle pink" data-color="#ED64C8" title="Pink"></div>
+        </div>
+      </div>
+    </div>
   </header>
   <div id="mainWrapper" class="main-wrapper">
     <aside class="sidebar">
@@ -57,14 +103,14 @@
         <button class="add-note-btn" onclick="openNoteDialog()">
           <i class="ri-add-large-line"></i> <span>Add New Note</span>
         </button>
-        <button id="exportNotesBtn" class="export-import-btn" title="Export Notes">
+        <button id="sidebarExportNotesBtn" class="export-import-btn" title="Export Notes">
           <i class="ri-download-line"></i> <span>Export Notes</span>
         </button>
-        <input type="file" id="importNotesInput" accept="application/json" style="display: none" />
-        <button id="importNotesBtn" class="export-import-btn" title="Import Notes">
+        <input type="file" id="sidebarImportNotesInput" accept="application/json" style="display: none" />
+        <button id="sidebarImportNotesBtn" class="export-import-btn" title="Import Notes">
           <i class="ri-upload-line"></i> <span>Import Notes</span>
         </button>
-        <button id="deleteAllNotesBtn" class="delete-all-btn" title="Delete All Notes">
+        <button id="sidebarDeleteAllNotesBtn" class="delete-all-btn" title="Delete All Notes">
           <i class="ri-delete-bin-line"></i> <span>Delete All Notes</span>
         </button>
       </div>
